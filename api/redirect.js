@@ -1,26 +1,40 @@
 const clientPromise = require('../lib/mongodb');
 
-module.exports = async (req, res) => {
+exports.handler = async (event, context) => {
   // Configurar CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS'
+  };
 
   // Lidar com requisições OPTIONS (CORS preflight)
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
   }
 
   // Apenas aceitar GET
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Método não permitido' });
+  if (event.httpMethod !== 'GET') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: 'Método não permitido' })
+    };
   }
 
   try {
-    const { shortCode } = req.query;
+    const { shortCode } = event.queryStringParameters || {};
 
     if (!shortCode) {
-      return res.status(400).json({ error: 'Código da URL é obrigatório' });
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Código da URL é obrigatório' })
+      };
     }
 
     // Conectar ao MongoDB
@@ -32,7 +46,11 @@ module.exports = async (req, res) => {
     const url = await collection.findOne({ shortCode });
 
     if (!url) {
-      return res.status(404).json({ error: 'URL não encontrada' });
+      return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({ error: 'URL não encontrada' })
+      };
     }
 
     // Incrementar contador de cliques
@@ -42,10 +60,21 @@ module.exports = async (req, res) => {
     );
 
     // Redirecionar para URL original
-    res.redirect(url.originalUrl);
+    return {
+      statusCode: 302,
+      headers: {
+        ...headers,
+        'Location': url.originalUrl
+      },
+      body: ''
+    };
 
   } catch (error) {
     console.error('Erro:', error);
-    res.status(500).json({ error: 'Erro interno do servidor' });
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Erro interno do servidor' })
+    };
   }
 }; 

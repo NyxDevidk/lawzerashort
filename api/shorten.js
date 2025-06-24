@@ -11,31 +11,49 @@ function isValidUrl(string) {
   }
 }
 
-module.exports = async (req, res) => {
+exports.handler = async (event, context) => {
   // Configurar CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+  };
 
   // Lidar com requisições OPTIONS (CORS preflight)
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
   }
 
   // Apenas aceitar POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' });
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: 'Método não permitido' })
+    };
   }
 
   try {
-    const { originalUrl } = req.body;
+    const { originalUrl } = JSON.parse(event.body);
 
     if (!originalUrl) {
-      return res.status(400).json({ error: 'URL é obrigatória' });
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'URL é obrigatória' })
+      };
     }
 
     if (!isValidUrl(originalUrl)) {
-      return res.status(400).json({ error: 'URL inválida' });
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'URL inválida' })
+      };
     }
 
     // Conectar ao MongoDB
@@ -65,18 +83,26 @@ module.exports = async (req, res) => {
     await collection.insertOne(newUrl);
 
     // Construir URL curta
-    const host = req.headers.host || 'localhost:3000';
-    const protocol = req.headers['x-forwarded-proto'] || 'http';
+    const host = event.headers.host || 'localhost:3000';
+    const protocol = event.headers['x-forwarded-proto'] || 'http';
     const shortUrl = `${protocol}://${host}/${shortCode}`;
 
-    res.json({
-      originalUrl,
-      shortUrl,
-      shortCode
-    });
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        originalUrl,
+        shortUrl,
+        shortCode
+      })
+    };
 
   } catch (error) {
     console.error('Erro:', error);
-    res.status(500).json({ error: 'Erro interno do servidor' });
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Erro interno do servidor' })
+    };
   }
 }; 

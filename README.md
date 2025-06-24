@@ -1,6 +1,6 @@
 # 🔗 LawzeraShort - Lawzera Dev
 
-Um encurtador de URLs moderno e eficiente, desenvolvido com Node.js, Express, MongoDB Atlas e Vercel.
+Um encurtador de URLs moderno e eficiente, desenvolvido com Node.js, Express, MongoDB Atlas e Netlify.
 
 ## ✨ Funcionalidades
 
@@ -12,7 +12,7 @@ Um encurtador de URLs moderno e eficiente, desenvolvido com Node.js, Express, Mo
 - **Histórico**: Visualize todas as URLs encurtadas
 - **Responsivo**: Funciona perfeitamente em desktop e mobile
 - **Persistência Real**: Dados salvos no MongoDB Atlas
-- **Deploy Serverless**: Hospedado no Vercel
+- **Deploy Serverless**: Hospedado no Netlify
 
 ## 🚀 Como Funciona
 
@@ -28,7 +28,7 @@ Um encurtador de URLs moderno e eficiente, desenvolvido com Node.js, Express, Mo
 - Node.js (versão 14 ou superior)
 - npm ou yarn
 - Conta no MongoDB Atlas
-- Conta no Vercel
+- Conta no Netlify
 
 ### Passos
 
@@ -60,9 +60,9 @@ NODE_ENV=development
 npm run dev
 ```
 
-6. **Deploy no Vercel**
+6. **Deploy no Netlify**
    - Faça push para GitHub
-   - Conecte no Vercel
+   - Conecte no Netlify
    - Configure a variável `MONGODB_URI`
    - Deploy automático
 
@@ -71,7 +71,7 @@ npm run dev
 - **Backend**: Node.js + Express
 - **Banco de Dados**: MongoDB Atlas
 - **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
-- **Deploy**: Vercel (Serverless Functions)
+- **Deploy**: Netlify (Serverless Functions)
 - **Geração de IDs**: nanoid
 - **Ícones**: Font Awesome
 
@@ -79,10 +79,11 @@ npm run dev
 
 ```
 lawzerashort/
-├── api/                 # Funções serverless do Vercel
+├── api/                 # Funções serverless do Netlify
 │   ├── shorten.js      # Encurtar URLs
 │   ├── urls.js         # Listar URLs
-│   └── redirect.js     # Redirecionamento
+│   ├── redirect.js     # Redirecionamento
+│   └── test.js         # Função de teste
 ├── lib/                # Configurações
 │   └── mongodb.js      # Conexão MongoDB
 ├── public/             # Arquivos estáticos
@@ -90,7 +91,7 @@ lawzerashort/
 │   ├── style.css       # Estilos CSS
 │   └── script.js       # JavaScript do frontend
 ├── server.js           # Servidor local (desenvolvimento)
-├── vercel.json         # Configuração Vercel
+├── netlify.toml        # Configuração Netlify
 ├── package.json        # Dependências e scripts
 └── README.md           # Este arquivo
 ```
@@ -111,7 +112,7 @@ Encurta uma URL.
 ```json
 {
   "originalUrl": "https://exemplo.com/url-muito-longa",
-  "shortUrl": "https://lawzerashort.vercel.app/abc123",
+  "shortUrl": "https://lawzerashort.netlify.app/abc123",
   "shortCode": "abc123"
 }
 ```
@@ -121,6 +122,9 @@ Redireciona para a URL original.
 
 ### GET `/api/urls`
 Lista todas as URLs encurtadas.
+
+### GET `/api/test`
+Testa se a API está funcionando.
 
 ## 🗄️ Banco de Dados
 
@@ -174,9 +178,9 @@ db.urls.createIndex({ "createdAt": -1 })
 
 ## 🚀 Deploy
 
-### Vercel (Recomendado)
+### Netlify (Recomendado)
 1. Faça push para GitHub
-2. Conecte no Vercel
+2. Conecte no Netlify
 3. Configure `MONGODB_URI`
 4. Deploy automático
 
@@ -187,7 +191,7 @@ Veja [DEPLOY.md](./DEPLOY.md) para outras opções.
 
 ### Gratuito
 - **MongoDB Atlas**: 512MB storage, 500 conexões
-- **Vercel**: 100GB bandwidth/mês, 1000 invocações/dia
+- **Netlify**: 100GB bandwidth/mês, 125k function invocações/mês
 
 ## 🤝 Contribuição
 
